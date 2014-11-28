@@ -3,24 +3,58 @@
 \name{listr}
 \alias{listr}
 \alias{listr-package}
-\title{Package Title}
+\title{Extended List Functionalities}
 \description{
-Package description
+The package provides extended functionality for working with lists
 }
-\details{
-The core functions/methods of this package:
+\section{Core functions}{
+
+
  \itemize{
-   \item{\code{\link[listr]{function-name}}: }{
+   \item{\code{\link[listr]{getStructure}}: }{
 
-     Description of this function.
-
-     Use empty lines for creating vertical space.
+     Retrieve list structure.
    }
-   \item{\code{\link[listr]{function-name}}: }{
+   \item{\code{\link[listr]{getByType}}: }{
 
-     Description of this function.
+     Retrieve values by \code{type} as returned by
+     \code{\link[listr]{getStructure}}
+   }
+   \item{\code{\link[listr]{getByLevel}}: }{
 
-     Use empty lines for creating vertical space.
+     Retrieve values by \code{level} as returned by
+     \code{\link[listr]{getStructure}}
+   }
+   \item{\code{\link[listr]{getByName}}: }{
+
+     Retrieve values by \code{name} as returned by
+     \code{\link[listr]{getStructure}}
+   }
+}
+}
+
+\section{Core classes}{
+
+
+ \itemize{
+   \item{\code{\link[listr]{ExtendedObjectStructure.S3}}: }{
+
+     Class to represent extended object structures
+   }
+ }
+}
+
+\section{Classes with internal character}{
+
+
+ \itemize{
+   \item{\code{\link[listr]{ObjectStructure.S3}}: }{
+
+     Class to represent regular object structure objects
+   }
+   \item{\code{\link[listr]{RawObjectStructure.S3}}: }{
+
+     Class to represent raw object structure objects
    }
 }
 }
