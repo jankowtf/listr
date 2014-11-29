@@ -108,7 +108,8 @@ setMethod(
   ) {
     
   ## Columns to temporarily exclude //
-  idx_excl <- which(colnames(input) %in% c("name", "class", "str"))
+#   idx_excl <- which(colnames(input) %in% c("name", "class", "str"))
+  idx_excl <- which(colnames(input) %in% c("name", "class", "str", "level", "dim"))
   input_excl <- input[,idx_excl]
   input <- input[,-idx_excl, drop = FALSE]
   

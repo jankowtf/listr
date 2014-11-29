@@ -75,7 +75,7 @@ setMethod(
 #     paste0("[[", paste(x, collapse = "]][["), "]]")
     sprintf("[[%s]]", paste(x, collapse = "]][["))
   }
-  .computeParentIndex <- function(x) {
+  .computeOuterIndex <- function(x) {
     x <- as.numeric(na.omit(x))
     if (length(x) > 1) {
       sprintf("[[%s]]%s", 
@@ -86,35 +86,58 @@ setMethod(
       sprintf("[%s]", x)
     }
   }
+  .combineNameElements <- function(x, sep = "/") {
+    paste(as.character(na.omit(x)), collapse = sep)
+  }
+  .createPathNames <- function(x, name_vec) {
+    y <- x
+    sapply(1:ncol(x), function(col) {
+      idx <- which(!duplicated(x[,col]) & !is.na(x[,col]))
+      sapply(seq(along = idx), function(ii) {
+        row <- idx[ii]
+        pos <- as.character(x[row, col])
+        val <- if (!is.na(name_vec[row])) name_vec[row] else pos
+        x[!is.na(x[, col]) & x[, col] == x[row, col], col] <<- val
+        y[!is.na(y[, col]) & y[, col] == y[row, col], col] <<- pos
+      })
+    })
+    data.frame(
+      path = apply(x, 1, .combineNameElements),
+      ppath = apply(y, 1, .combineNameElements),
+      stringsAsFactors = FALSE
+    )
+  }
 
   ## Columns to temporarily exclude //
-  idx_excl <- which(colnames(input) %in% c("name", "class", "str"))
-  input_excl <- input[,idx_excl]
-  input <- input[,-idx_excl, drop = FALSE]
+#   idx_excl <- which(colnames(input) %in% c("name", "class", "str"))
+  idx_excl <- which(colnames(input) %in% c("name", "class", "str", "level", "dim"))
+  excl <- input[,idx_excl]
+
+  ## PATCH //
+  do_level <- if (!"level" %in%colnames(input)) TRUE else FALSE
   
   ## Substitute zeros with NAs //
-  tmp <- as.data.frame(apply(input, 2, .substituteZeros))
+  input <- as.data.frame(apply(input[,-idx_excl, drop = FALSE], 
+    2, .substituteZeros))
   
-  f <- tmp[,1]
-  spl <- split(tmp, f = f)
-  tmp <- lapply(spl, function(ii) {
-#     info <- lapply(1:nrow(ii), function(ii2) {
-#       data.frame(
-#         level = length(na.omit(as.numeric(ii[ii2,,drop = TRUE]))),
-#         index = paste0("[[", paste(na.omit(as.numeric(ii[ii2,,drop = TRUE])), 
-#           collapse = "]][["), "]]"),
-#         stringsAsFactors = FALSE
-#       )
-#     })
-#     info <- do.call("rbind", info)
-    ## --> works, but probably slower than using `apply()`
-    ## Keep as reference
+  f <- input[,1]
+  spl <- split(input, f = f)
+  excl_spl <- split(excl, f = f)
+
+  input <- lapply(seq(along = spl), function(ii) {
+    .main <- spl[[ii]]
+    .excl <- excl_spl[[ii]]
     
-    .level <- apply(ii, 1, .computeLevel)
-    .index <- apply(ii, 1, .computeIndex)
-    .parent_index <- apply(ii, 1, .computeParentIndex)
+    .level <- if (do_level) {
+      apply(.main, 1, .computeLevel)
+    } else {
+      NULL
+    }
+    .index <- apply(.main, 1, .computeIndex)
+    .outer_index <- apply(.main, 1, .computeOuterIndex)
+    .path <- .createPathNames(x = .main, name_vec = .excl$name)
     
-    .leaf <- rep(FALSE, nrow(ii))
+    .leaf <- rep(FALSE, nrow(.main))
     .leaf[which(.level == which.max(.level))] <- TRUE
     .type <- sapply(as.character(.leaf), switch, "FALSE" = 2, "TRUE" = 3)
     if (length(.type) > 1) {
@@ -122,14 +145,19 @@ setMethod(
     } else {
       .type <- 3
     }
-    data.frame(ii, level = .level, type = .type, index = .index, 
-      pindex = .parent_index, stringsAsFactors = FALSE)
+    if (do_level) {
+      data.frame(.main, level = .level, type = .type, index = .index, 
+        oindex = .outer_index, .path, stringsAsFactors = FALSE)
+    } else {
+      data.frame(.main, type = .type, index = .index, 
+        oindex = .outer_index, .path, stringsAsFactors = FALSE)
+    }
   })
-  out <- unsplit(tmp, f = f)
+  out <- unsplit(input, f = f)
   listr::ExtendedObjectStructure.S3(
-    .x = data.frame(out, input_excl, stringsAsFactors = FALSE)
+    .x = data.frame(out, excl, stringsAsFactors = FALSE)
   )
-    
+
   }
 )
 

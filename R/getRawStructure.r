@@ -57,7 +57,8 @@ setMethod(
     ...
   ) {
  
-  struc <- capture.output(str(input))
+  if (FALSE) {
+  struc <- capture.output(str(input, list.len = length(input)))
   struc <- unlist(strsplit(struc, split = "\n"))
   tops <- str_count(struc, "\\s\\$\\s")
   subs <- str_count(struc, "((\\.\\.)(\\s|\\$))")
@@ -99,7 +100,47 @@ setMethod(
     stringsAsFactors = FALSE
   )
   listr::RawObjectStructure.S3(.x = out)
+  }
     
+  .getRawStructure <- function(x, level = 0) {
+    level <- level + 1
+    out <- lapply(seq(along = x), function(el) {
+      name <- names(x[el])
+      value <- x[[el]]
+      cls <- class(value)
+      .dim <- if (cls %in% c("data.frame", "matrix")) {
+        paste(dim(value), collapse = " ")
+      } else {
+        length(value)
+      }  
+      out <- data.frame(
+        level = level,
+        name = if (is.null(name) || name == "") NA else name,
+        class = cls,
+        dim = .dim,
+        stringsAsFactors = FALSE
+      )
+      if (cls == "list") {
+        deep <- .getRawStructure(x = value, level = level)
+        c(list(out), unlist(deep, recursive = FALSE))
+      } else {
+        list(out)
+      }
+    })  
+  }
+  tmp <- do.call("rbind", unlist(.getRawStructure(x = input), recursive = FALSE))
+#   tmp$name[tmp$name == ""] <- NA
+  subs <- tmp$level
+  subs_2 <- lapply(1:subs[which.max(subs)], function(ii) {
+    out <- subs == ii
+    out[out] <- 1
+    out
+  })
+  names(subs_2) <- 1:length(subs_2)
+  listr::RawObjectStructure.S3(
+    .x = data.frame(subs_2, tmp, stringsAsFactors = FALSE)
+  )
+
   }
 )
 
