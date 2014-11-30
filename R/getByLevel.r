@@ -2,12 +2,20 @@
 #' Get By Level (generic)
 #'
 #' @description 
-#' Retrieves actual values based on their \code{level} index.
-#'   	
+#' Retrieves actual values based on their \code{level}.
+#'     
 #' @param input \strong{Signature argument}.
 #'    Object containing structure information.
-#' @param level \code{\link{numeric}} or \code{\link{integer}}.
-#'    Level index as returned by \link[listr]{getStructure}.
+#' @param value \code{\link{character}}.
+#'    Level as found in return value of \link[listr]{getStructure}.
+#' @param outer \code{\link{logical}}.
+#'    \code{TRUE}: use \code{oindex} instead of \code{index} to retrieve the 
+#'      outer element values (i.e., outer list structure is preserved);
+#'    \code{FALSE}: use \code{index} to retrieve the inner element values
+#'      (i.e. outer list structure is not preserved).
+#' @param resolve \code{\link{logical}}.
+#'    \code{TRUE}: resolve path to basename component as names for return value;
+#'    \code{FALSE}: use path as names for return value. 
 #' @param strict \code{\link{numeric}}.
 #'    \itemize{
 #'      \item{\code{0}: } {ignore without warning}
@@ -30,8 +38,9 @@ setGeneric(
   ),
   def = function(
     input,
-    level = c(1, 2, 3),
-    parent = FALSE,
+    value,
+    outer = FALSE,
+    resolve = FALSE,
     strict = c(0, 1, 2),
     ...
   ) {
@@ -64,51 +73,61 @@ setMethod(
   ), 
   definition = function(
     input,
-    level,
-    parent,
+    value,
+    outer,
+    resolve,
     strict,
     ...
   ) {
         
-  ## Argument checks //
-  strict <- as.numeric(match.arg(as.character(strict), 
-    as.character(c(0, 1, 2))))     
-    
-  struc <- getStructure(input = input, extended = TRUE)
-  if (!all(level %in% struc$level)) {
-    out <- if (strict == 0) {
-      list()
-    } else if (strict == 1) {
-      conditionr::signalCondition(
-        condition = "InvalidLevel",
-        msg = c(
-          Reason = "invalid level",
-          Level = level
-        ),
-        ns = "listr",
-        type = "warning"
-      ) 
-      list()
-    } else if (strict == 2) {
-      conditionr::signalCondition(
-        condition = "InvalidLevel",
-        msg = c(
-          Reason = "invalid level",
-          Level = level
-        ),
-        ns = "listr",
-        type = "error"
-      ) 
-    }
-    return(out)
-  }
-  
-  index <- if (!parent) "index" else "pindex"
-  expr <- parse(text = paste0("input", struc[which(struc$level == level), index]))
-  nms <- struc[which(struc$level == level), "name"]
-  nms[is.na(nms)] <- ""
-  envir <- environment()
-  structure(lapply(expr, eval, envir = envir), names = nms)
+#   ## Argument checks //
+#   strict <- as.numeric(match.arg(as.character(strict), 
+#     as.character(c(0, 1, 2))))     
+#     
+#   struc <- getStructure(input = input, extended = TRUE)
+#   if (!all(level %in% struc$level)) {
+#     out <- if (strict == 0) {
+#       list()
+#     } else if (strict == 1) {
+#       conditionr::signalCondition(
+#         condition = "InvalidLevel",
+#         msg = c(
+#           Reason = "invalid level",
+#           Level = level
+#         ),
+#         ns = "listr",
+#         type = "warning"
+#       ) 
+#       list()
+#     } else if (strict == 2) {
+#       conditionr::signalCondition(
+#         condition = "InvalidLevel",
+#         msg = c(
+#           Reason = "invalid level",
+#           Level = level
+#         ),
+#         ns = "listr",
+#         type = "error"
+#       ) 
+#     }
+#     return(out)
+#   }
+#   
+#   index <- if (!parent) "index" else "pindex"
+#   expr <- parse(text = paste0("input", struc[which(struc$level == level), index]))
+#   nms <- struc[which(struc$level == level), "name"]
+#   nms[is.na(nms)] <- ""
+#   envir <- environment()
+#   structure(lapply(expr, eval, envir = envir), names = nms)
+  getBy(
+    input = input,
+    value = value,
+    field = "level",
+    outer = outer,
+    resolve = resolve,
+    strict = strict,  
+    ...
+  )
     
   }
 )

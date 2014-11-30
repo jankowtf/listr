@@ -3,15 +3,25 @@
 \alias{getByLevel}
 \title{Get By Level (generic)}
 \usage{
-getByLevel(input, level = c(1, 2, 3), parent = FALSE, strict = c(0, 1, 2),
-  ...)
+getByLevel(input, value, outer = FALSE, resolve = FALSE, strict = c(0, 1,
+  2), ...)
 }
 \arguments{
 \item{input}{\strong{Signature argument}.
 Object containing structure information.}
 
-\item{level}{\code{\link{numeric}} or \code{\link{integer}}.
-Level index as returned by \link[listr]{getStructure}.}
+\item{value}{\code{\link{character}}.
+Level as found in return value of \link[listr]{getStructure}.}
+
+\item{outer}{\code{\link{logical}}.
+\code{TRUE}: use \code{oindex} instead of \code{index} to retrieve the
+  outer element values (i.e., outer list structure is preserved);
+\code{FALSE}: use \code{index} to retrieve the inner element values
+  (i.e. outer list structure is not preserved).}
+
+\item{resolve}{\code{\link{logical}}.
+\code{TRUE}: resolve path to basename component as names for return value;
+\code{FALSE}: use path as names for return value.}
 
 \item{strict}{\code{\link{numeric}}.
 \itemize{
@@ -23,13 +33,14 @@ Level index as returned by \link[listr]{getStructure}.}
 \item{...}{Further arguments to be passed to subsequent functions/methods.}
 }
 \description{
-Retrieves actual values based on their \code{level} index.
+Retrieves actual values based on their \code{level}.
 }
 \examples{
 \dontrun{
 
 input <- list(
-  x1 = list(x11 = list(x111 = 1, x112 = 1), x12 = list(x121 = 1, x122 = 1)),
+  x1 = list(x11 = list(x111 = list(x1111 = 1, x1112 = 2), x112 = 1), 
+    x12 = list(x121 = 1, x122 = 1)),
   x2 = list(x21 = "x21"),
   x3 = list("x31"),
   x4 = "x4",
@@ -45,15 +56,25 @@ input <- list(
   data.frame(x = 1:3, y = 1:3)
 )
 
-## Type 1 (top-level branches) //
-getByType(input, type = 1)
-## --> identical to `input`
+## Inspect structure //
+(struc <- getStructure(input))
 
-## Type 2 (intermediate-level branches) //
-getByType(input, type = 2)
+getByLevel(input, value = 1)
+getByLevel(input, value = 1, resolve = TRUE)
 
-## Type 3 (leafs) //
-getByType(input, type = 3)
+getByLevel(input, value = 2)
+getByLevel(input, value = 2, resolve = TRUE)
+
+getByLevel(input, value = 3)
+getByLevel(input, value = 3, resolve = TRUE)
+
+getByLevel(input, value = 4)
+getByLevel(input, value = 4, resolve = TRUE)
+
+## Condition handling //
+getByLevel(input, value = 5)
+try(getByLevel(input, value = 5, strict = 1))
+try(getByLevel(input, value = 5, strict = 2))
 
 }
 }

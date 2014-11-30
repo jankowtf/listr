@@ -23,10 +23,10 @@ test_that("extendStructure/ObjectStructure.S3", {
   input <- getStructure(input, extended = FALSE)
   expect_is(res <- extendStructure(input), "ExtendedObjectStructure.S3")
   expect_true(all(names(res) %in% 
-    c("X1", "X2", "X3", "level", "type", "index", "pindex", 
-      "name", "class", "str")))
+    c("X1", "X2", "X3", "level", "type", "index", "oindex", "path", "ppath",
+      "level", "name", "class", "dim")))
   expect_true(inherits(res, "data.frame"))
-  expect_true(nrow(res) == 32)
+  expect_true(nrow(res) == 30)
   
 })
 

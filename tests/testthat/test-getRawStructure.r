@@ -21,8 +21,8 @@ test_that("getRawStructure", {
     data.frame(x = 1:3, y = 1:3)
   )
   expect_is(res <- getRawStructure(input), "RawObjectStructure.S3")
-  expect_true(all(names(res) %in% c("X1", "X2", "X3", "name", "class", "str")))
+  expect_true(all(names(res) %in% c("X1", "X2", "X3", "level", "name", "class", "dim")))
   expect_true(inherits(res, "data.frame"))
-  expect_true(nrow(res) == 32)
+  expect_true(nrow(res) == 30)
   
 })

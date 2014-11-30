@@ -3,7 +3,7 @@
 \name{listr}
 \alias{listr}
 \alias{listr-package}
-\title{Extended List Functionalities}
+\title{Extended List Functionality}
 \description{
 The package provides extended functionality for working with lists
 }
@@ -28,6 +28,12 @@ The package provides extended functionality for working with lists
    \item{\code{\link[listr]{getByName}}: }{
 
      Retrieve values by \code{name} as returned by
+     \code{\link[listr]{getStructure}}
+   }
+   \item{\code{\link[listr]{getByPath}}: }{
+
+     Retrieve values by name-based (field \code{path}) or position-based
+     paths (field \code{ppath}) as returned by
      \code{\link[listr]{getStructure}}
    }
 }

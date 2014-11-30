@@ -11,9 +11,9 @@ test_that("getByName/list", {
     x4 = "x4",
     x5 = list(1:3)
   )
-  expect_identical(res <- getByName(input, name = "x1"), input[1])
-  expect_identical(res <- getByName(input, name = "x11"), input$x1[1])
-  expect_identical(res <- getByName(input, name = "x111"), input$x1$x11[1])
+  expect_identical(res <- getByName(input, value = "x1"), input[1])
+  expect_identical(res <- getByName(input, value = "x11"), input$x1[1])
+  expect_identical(res <- getByName(input, value = "x111"), input$x1$x11[1])
   
 })
 
@@ -26,7 +26,7 @@ test_that("getByName/list/multiple", {
     x4 = "x4",
     x5 = list(1:3)
   )
-  expect_identical(res <- getByName(input, name = c("x1", "x11")), 
+  expect_identical(res <- getByName(input, value = c("x1", "x11")), 
     c(input[1], input$x1[1]))
   
 })
@@ -34,8 +34,8 @@ test_that("getByName/list/multiple", {
 test_that("getByName/list/invalid", {
   
   input <- list(1)
-  expect_identical(getByName(input, name = "x1111"), list())
-  expect_warning(getByName(input, name = "x1111", strict = 1))
-  expect_error(getByName(input, name = "x1111", strict = 2))
+  expect_identical(getByName(input, value = "x1111"), list())
+  expect_warning(getByName(input, value = "x1111", strict = 1))
+  expect_error(getByName(input, value = "x1111", strict = 2))
   
 })

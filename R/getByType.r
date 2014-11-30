@@ -2,15 +2,25 @@
 #' Get By Type (generic)
 #'
 #' @description 
-#' Retrieves actual values based on \code{type}.
-#'   	
+#' Retrieves actual values based on their \code{type}.
+#'     
 #' @param input \strong{Signature argument}.
 #'    Object containing structure information.
-#' @param type \code{\link{numeric}} or \code{\link{integer}}.
+#' @param value \code{\link{character}}.
+#'    Type as found in return value of \link[listr]{getStructure}.
+#' @param outer \code{\link{logical}}.
+#'    \code{TRUE}: use \code{oindex} instead of \code{index} to retrieve the 
+#'      outer element values (i.e., outer list structure is preserved);
+#'    \code{FALSE}: use \code{index} to retrieve the inner element values
+#'      (i.e. outer list structure is not preserved).
+#' @param resolve \code{\link{logical}}.
+#'    \code{TRUE}: resolve path to basename component as names for return value;
+#'    \code{FALSE}: use path as names for return value. 
+#' @param strict \code{\link{numeric}}.
 #'    \itemize{
-#'      \item{1: } {top-level branch values}
-#'      \item{1: } {intermediate-level branch values}
-#'      \item{3: } {leaf values}
+#'      \item{\code{0}: } {ignore without warning}
+#'      \item{\code{1}: } {ignore with Warning}
+#'      \item{\code{2}: } {stop with error}
 #'    }
 #' @template threedots
 #' @example inst/examples/getByType.r
@@ -28,7 +38,10 @@ setGeneric(
   ),
   def = function(
     input,
-    type = c(1, 2, 3),
+    value,
+    outer = FALSE,
+    resolve = FALSE,
+    strict = c(0, 1, 2),
     ...
   ) {
     standardGeneric("getByType")       
@@ -60,20 +73,22 @@ setMethod(
   ), 
   definition = function(
     input,
-    type,
+    value,
+    outer,
+    resolve,
+    strict,
     ...
   ) {
-    
-  ## Argument checks //
-  type <- as.numeric(match.arg(as.character(type), 
-    as.character(c(1:3))))   
-    
-  struc <- getStructure(input = input, extended = TRUE)
-  expr <- parse(text = paste0("input", struc[which(struc$type == type), "index"]))
-  nms <- struc[which(struc$type == type), "name"]
-  nms[is.na(nms)] <- ""
-  envir <- environment()
-  structure(lapply(expr, eval, envir = envir), names = nms)
+
+  getBy(
+    input = input,
+    value = value,
+    field = "type",
+    outer = outer,
+    resolve = resolve,
+    strict = strict,  
+    ...
+  )
     
   }
 )

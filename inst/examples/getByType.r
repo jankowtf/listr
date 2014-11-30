@@ -17,14 +17,21 @@ input <- list(
   data.frame(x = 1:3, y = 1:3)
 )
 
+## Inspect structure //
+(struc <- getStructure(input))
+
 ## Type 1 (top-level branches) //
-getByType(input, type = 1)
-## --> identical to `input`
+getByType(input, value = 1)
 
 ## Type 2 (intermediate-level branches) //
-getByType(input, type = 2)
+getByType(input, value = 2)
 
 ## Type 3 (leafs) //
-getByType(input, type = 3)
+getByType(input, value = 3)
+
+## Condition handling //
+getByType(input, value = 4)
+try(getByType(input, value = 4, strict = 1))
+try(getByType(input, value = 4, strict = 2))
 
 }

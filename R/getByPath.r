@@ -80,56 +80,66 @@ setMethod(
     ...
   ) {
     
-  ## Argument checks //
-  strict <- as.numeric(match.arg(as.character(strict), 
-    as.character(c(0, 1, 2))))       
-        
-  struc <- getStructure(input = input, extended = TRUE)
-  field <- "path"
-  if (!all(value %in% struc[[field]])) {
-    field <- "ppath"
-    if (!all(value %in% struc[[field]])) {
-      out <- if (strict == 0) {
-        list()
-      } else if (strict == 1) {
-        conditionr::signalCondition(
-          condition = "Invalid",
-          msg = c(
-            Reason = "invalid retrieval value",
-            Value = value,
-            Available = paste(struc[[field]], collapse = ", ")
-          ),
-          ns = "listr",
-          type = "warning"
-        ) 
-        list()
-      } else if (strict == 2) {
-        conditionr::signalCondition(
-          condition = "InvalidName",
-          msg = c(
-            Reason = "invalid retrieval value",
-            Value = value,
-            Available = paste(struc[[field]], collapse = ", ")
-          ),
-          ns = "listr",
-          type = "error"
-        ) 
-      }
-      return(out)
-    }
-  }
-  
-  index <- if (!outer) "index" else "oindex"
-  expr <- parse(text = paste0("input", 
-    struc[which(struc[[field]] == value), index]))
-  nms <- if (!resolve) {
-    struc[which(struc[[field]] == value), field]
-  } else {
-    struc[which(struc[[field]] == value), "name"]
-  }
-  nms[is.na(nms)] <- ""
-  envir <- environment()
-  structure(lapply(expr, eval, envir = envir), names = nms)
+#   ## Argument checks //
+#   strict <- as.numeric(match.arg(as.character(strict), 
+#     as.character(c(0, 1, 2))))       
+#         
+#   struc <- getStructure(input = input, extended = TRUE)
+#   field <- "path"
+#   if (!all(value %in% struc[[field]])) {
+#     field <- "ppath"
+#     if (!all(value %in% struc[[field]])) {
+#       out <- if (strict == 0) {
+#         list()
+#       } else if (strict == 1) {
+#         conditionr::signalCondition(
+#           condition = "Invalid",
+#           msg = c(
+#             Reason = "invalid retrieval value",
+#             Value = value,
+#             Available = paste(struc[[field]], collapse = ", ")
+#           ),
+#           ns = "listr",
+#           type = "warning"
+#         ) 
+#         list()
+#       } else if (strict == 2) {
+#         conditionr::signalCondition(
+#           condition = "InvalidName",
+#           msg = c(
+#             Reason = "invalid retrieval value",
+#             Value = value,
+#             Available = paste(struc[[field]], collapse = ", ")
+#           ),
+#           ns = "listr",
+#           type = "error"
+#         ) 
+#       }
+#       return(out)
+#     }
+#   }
+#   
+#   index <- if (!outer) "index" else "oindex"
+#   expr <- parse(text = paste0("input", 
+#     struc[which(struc[[field]] == value), index]))
+#   nms <- if (!resolve) {
+#     struc[which(struc[[field]] == value), field]
+#   } else {
+#     struc[which(struc[[field]] == value), "name"]
+#   }
+#   nms[is.na(nms)] <- ""
+#   envir <- environment()
+#   structure(lapply(expr, eval, envir = envir), names = nms)
+    getBy(
+      input = input,
+      value = value,
+      field = "path", 
+      field_2 = "ppath",
+      outer = outer,
+      resolve = resolve,
+      strict = strict,  
+      ...
+    )
     
   }
 )

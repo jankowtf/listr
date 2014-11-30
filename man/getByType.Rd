@@ -3,23 +3,37 @@
 \alias{getByType}
 \title{Get By Type (generic)}
 \usage{
-getByType(input, type = c(1, 2, 3), ...)
+getByType(input, value, outer = FALSE, resolve = FALSE, strict = c(0, 1,
+  2), ...)
 }
 \arguments{
 \item{input}{\strong{Signature argument}.
 Object containing structure information.}
 
-\item{type}{\code{\link{numeric}} or \code{\link{integer}}.
+\item{value}{\code{\link{character}}.
+Type as found in return value of \link[listr]{getStructure}.}
+
+\item{outer}{\code{\link{logical}}.
+\code{TRUE}: use \code{oindex} instead of \code{index} to retrieve the
+  outer element values (i.e., outer list structure is preserved);
+\code{FALSE}: use \code{index} to retrieve the inner element values
+  (i.e. outer list structure is not preserved).}
+
+\item{resolve}{\code{\link{logical}}.
+\code{TRUE}: resolve path to basename component as names for return value;
+\code{FALSE}: use path as names for return value.}
+
+\item{strict}{\code{\link{numeric}}.
 \itemize{
-  \item{1: } {top-level branch values}
-  \item{1: } {intermediate-level branch values}
-  \item{3: } {leaf values}
+  \item{\code{0}: } {ignore without warning}
+  \item{\code{1}: } {ignore with Warning}
+  \item{\code{2}: } {stop with error}
 }}
 
 \item{...}{Further arguments to be passed to subsequent functions/methods.}
 }
 \description{
-Retrieves actual values based on \code{type}.
+Retrieves actual values based on their \code{type}.
 }
 \examples{
 \dontrun{
@@ -41,15 +55,22 @@ input <- list(
   data.frame(x = 1:3, y = 1:3)
 )
 
+## Inspect structure //
+(struc <- getStructure(input))
+
 ## Type 1 (top-level branches) //
-getByType(input, type = 1)
-## --> identical to `input`
+getByType(input, value = 1)
 
 ## Type 2 (intermediate-level branches) //
-getByType(input, type = 2)
+getByType(input, value = 2)
 
 ## Type 3 (leafs) //
-getByType(input, type = 3)
+getByType(input, value = 3)
+
+## Condition handling //
+getByType(input, value = 4)
+try(getByType(input, value = 4, strict = 1))
+try(getByType(input, value = 4, strict = 2))
 
 }
 }

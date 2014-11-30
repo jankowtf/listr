@@ -2,12 +2,20 @@
 #' Get By Name (generic)
 #'
 #' @description 
-#' Retrieves actual values based on their \code{name} index.
-#'   	
+#' Retrieves actual values based on their \code{name}.
+#'     
 #' @param input \strong{Signature argument}.
 #'    Object containing structure information.
-#' @param name \code{\link{numeric}} or \code{\link{integer}}.
-#'    Name index as returned by \link[listr]{getStructure}.
+#' @param value \code{\link{character}}.
+#'    Name as found in return value of \link[listr]{getStructure}.
+#' @param outer \code{\link{logical}}.
+#'    \code{TRUE}: use \code{oindex} instead of \code{index} to retrieve the 
+#'      outer element values (i.e., outer list structure is preserved);
+#'    \code{FALSE}: use \code{index} to retrieve the inner element values
+#'      (i.e. outer list structure is not preserved).
+#' @param resolve \code{\link{logical}}.
+#'    \code{TRUE}: resolve path to basename component as names for return value;
+#'    \code{FALSE}: use path as names for return value. 
 #' @param strict \code{\link{numeric}}.
 #'    \itemize{
 #'      \item{\code{0}: } {ignore without warning}
@@ -30,8 +38,9 @@ setGeneric(
   ),
   def = function(
     input,
-    name,
-    parent = FALSE,
+    value,
+    outer = FALSE,
+    resolve = FALSE,
     strict = c(0, 1, 2),
     ...
   ) {
@@ -64,51 +73,22 @@ setMethod(
   ), 
   definition = function(
     input,
-    name,
-    parent,
+    value,
+    outer,
+    resolve,
     strict,
     ...
   ) {
     
-  ## Argument checks //
-  strict <- as.numeric(match.arg(as.character(strict), 
-    as.character(c(0, 1, 2))))       
-        
-  struc <- getStructure(input = input, extended = TRUE)
-  if (!all(name %in% struc$name)) {
-    out <- if (strict == 0) {
-      list()
-    } else if (strict == 1) {
-      conditionr::signalCondition(
-        condition = "InvalidName",
-        msg = c(
-          Reason = "invalid name",
-          Name = name
-        ),
-        ns = "listr",
-        type = "warning"
-      ) 
-      list()
-    } else if (strict == 2) {
-      conditionr::signalCondition(
-        condition = "InvalidName",
-        msg = c(
-          Reason = "invalid name",
-          Name = name
-        ),
-        ns = "listr",
-        type = "error"
-      ) 
-    }
-    return(out)
-  }
-  
-  index <- if (!parent) "index" else "pindex"
-  expr <- parse(text = paste0("input", struc[which(struc$name == name), index]))
-  nms <- struc[which(struc$name == name), "name"]
-  nms[is.na(nms)] <- ""
-  envir <- environment()
-  structure(lapply(expr, eval, envir = envir), names = nms)
+  getBy(
+    input = input,
+    value = value,
+    field = "name",
+    outer = outer,
+    resolve = resolve,
+    strict = strict,  
+    ...
+  )
     
   }
 )

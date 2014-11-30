@@ -2,7 +2,7 @@
 context("getByType/list")
 ##------------------------------------------------------------------------------
 
-test_that("getByType/list/type = 1", {
+test_that("getByType/list/value = 1", {
   
   input <- list(
     x1 = list(x11 = list(x111 = 1, x112 = 1), x12 = list(x121 = 1, x122 = 1)),
@@ -20,12 +20,13 @@ test_that("getByType/list/type = 1", {
     new.env(),
     data.frame(x = 1:3, y = 1:3)
   )
-  expect_is(res <- getByType(input, type = 1), "list")
-  expect_identical(res, input)
+
+  expect_is(res <- getByType(input, value = 1), "list")
+  expect_is(res <- getByType(input, value = 1, resolve = TRUE), "list")
   
 })
 
-test_that("getByType/list/type = 2", {
+test_that("getByType/list/value = 2", {
   
   input <- list(
     x1 = list(x11 = list(x111 = 1, x112 = 1), x12 = list(x121 = 1, x122 = 1)),
@@ -43,11 +44,12 @@ test_that("getByType/list/type = 2", {
     new.env(),
     data.frame(x = 1:3, y = 1:3)
   )
-  expect_is(res <- getByType(input, type = 2), "list")
+  expect_is(res <- getByType(input, value = 2), "list")
+  expect_is(res <- getByType(input, value = 2, resolve = TRUE), "list")
   
 })
 
-test_that("getByType/list/type = 3", {
+test_that("getByType/list/value = 3", {
   
   input <- list(
     x1 = list(x11 = list(x111 = 1, x112 = 1), x12 = list(x121 = 1, x122 = 1)),
@@ -65,7 +67,8 @@ test_that("getByType/list/type = 3", {
     new.env(),
     data.frame(x = 1:3, y = 1:3)
   )
-  getStructure(input)
-  expect_is(res <- getByType(input, type = 3), "list")
+  
+  expect_is(res <- getByType(input, value = 3), "list")
+  expect_is(res <- getByType(input, value = 3, resolve = TRUE), "list")
   
 })
